@@ -24,14 +24,4 @@ const useTeamsQuery = (enabled = true) => {
   });
 };
 
-// import { useQueries } from "@tanstack/react-query";
-
-// const usePlayersQuery = useQueries({
-//   queries: ids.map((id) => ({
-//     queryKey: ["post", id],
-//     queryFn: () => fetchPost(id),
-//     staleTime: Infinity,
-//   })),
-// });
-
 export { usePlayersQuery, useTeamsQuery };
