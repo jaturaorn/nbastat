@@ -4,10 +4,10 @@ import { useQuery } from "@tanstack/react-query";
 import { balldontlieAPI } from "@/utils/api";
 
 // Hook สำหรับ fetch players
-const usePlayersQuery = (enabled = true) => {
+const usePlayersQuery = (search?: string, enabled = true) => {
   return useQuery({
-    queryKey: ["players"],
-    queryFn: () => balldontlieAPI.getPlayers(),
+    queryKey: ["players", search],
+    queryFn: () => balldontlieAPI.getPlayers(search),
     enabled,
     staleTime: 5 * 60 * 1000, // 5 minutes
     retry: 2,
