@@ -38,9 +38,6 @@ export default function Home() {
     setSwitchDisplay(category);
   }
 
-  console.log("Current tab:", switchDisplay);
-  console.log(data);
-
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center">
       <div className="max-w-4xl mx-auto my-6 space-y-3">
@@ -116,7 +113,7 @@ export default function Home() {
         {/* No Results State - ไม่มี data */}
         {!isLoading && data && data.data.length === 0 && (
           <div className="text-center py-8">
-            <p className="text-gray-500">{`No players found for "{debouncedSearchTerm}"`}</p>
+            <p className="text-gray-500">{`No players found for "${debouncedSearchTerm}"`}</p>
           </div>
         )}
       </div>

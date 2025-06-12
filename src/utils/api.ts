@@ -30,15 +30,25 @@ export const balldontlieAPI = {
 
   // Get teams
   getTeams: async (search?: string) => {
-    const params: { per_page: number; search?: string } = { per_page: 30 };
+    const params: { per_page: number; search?: string } = { per_page: 50 };
     if (search) params.search = search;
     const response = await api.get<APIResponse<Team>>("/teams", { params });
-    const currentTeams = response.data.data.filter(
+    let currentTeams = response.data.data.filter(
       (team) =>
         team.conference.trim() !== "" &&
         team.division.trim() !== "" &&
-        team.conference !== "    " // ไม่ใช่ช่องว่าง
+        team.conference !== "    "
     );
+    // Client-side search filtering
+    if (search && search.trim()) {
+      currentTeams = currentTeams.filter(
+        (team) =>
+          team.full_name.toLowerCase().includes(search.toLowerCase()) ||
+          team.name.toLowerCase().includes(search.toLowerCase()) ||
+          team.city.toLowerCase().includes(search.toLowerCase()) ||
+          team.abbreviation.toLowerCase().includes(search.toLowerCase())
+      );
+    }
     return {
       ...response.data,
       data: currentTeams,
