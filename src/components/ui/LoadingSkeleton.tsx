@@ -1,6 +1,6 @@
 export default function LoadingSkeleton() {
   return (
-    <div className="flex flex-col gap-3 bg-white rounded-lg border border-gray-200 shadow-lg p-6 animate-pulse w-[300px]">
+    <div className="flex flex-col gap-3 bg-white rounded-lg border border-gray-200 shadow-lg p-6 animate-pulse w-full">
       {/* Player Name - h2 text-2xl */}
       <div className="h-8 bg-gray-200 rounded w-1/3"></div>
 
