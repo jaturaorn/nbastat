@@ -1,10 +1,28 @@
 import type { Player } from "@/types/nba";
 import React from "react";
+import { Heart } from "lucide-react";
+import { useNBAStore } from "@/store/useStore";
 
 const CardPlayers = ({ play }: { play: Player }) => {
+  const { isPlayerFavorite, togglePlayerFavorite } = useNBAStore();
+  const isFavorite = isPlayerFavorite(play.id);
   return (
     <React.Fragment>
-      <div className="flex flex-col gap-3 bg-white rounded-lg border border-gray-200 shadow-lg hover:shadow-xl p-6">
+      <div className="flex flex-col gap-3 bg-white rounded-lg border border-gray-200 shadow-lg hover:shadow-xl p-6 relative">
+        {/* Favorite Button */}
+        <button
+          onClick={(e) => {
+            e.stopPropagation(); // ป้องกัน card click
+            togglePlayerFavorite(play.id);
+          }}
+          className={`absolute top-4 right-4 p-2 rounded-full transition-colors ${
+            isFavorite
+              ? "bg-red-100 text-red-600 hover:bg-red-200"
+              : "bg-gray-100 text-gray-400 hover:bg-gray-200"
+          }`}
+        >
+          <Heart className={`w-5 h-5 ${isFavorite ? "fill-current" : ""}`} />
+        </button>
         <h2 className="text-2xl ">{`${play.first_name} ${play.last_name}`}</h2>
         <h4 className="text-lg">draftNumber: {play.draft_number}</h4>
         <p>Position: {play.position}</p>

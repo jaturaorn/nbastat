@@ -2,40 +2,40 @@
 
 import { usePlayersQuery, useTeamsQuery } from "@/hooks/useNBAQuery";
 import type { Player, Team } from "@/types/nba";
-import React, { useState } from "react";
+import React from "react";
 import { useDebounce } from "@/hooks/useDebounce";
 import CardPlayers from "@/components/ui/CardPlayers";
 import LoadingSkeleton from "@/components/ui/LoadingSkeleton";
+import { useNBAStore } from "@/store/useStore";
+import CardTeams from "@/components/ui/CardTeams";
 
 export default function Home() {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [switchDisplay, setSwitchDisplay] = useState<"players" | "teams">(
-    "players"
-  );
+  // Global state
+  const {
+    activeTab,
+    searchTerm,
+    setActiveTab,
+    setSearchTerm,
+    favoritePlayerIds,
+    favoriteTeamIds,
+  } = useNBAStore();
+
   const debouncedSearchTerm = useDebounce(searchTerm, 300);
+
+  // API calls ใช้ global state
   const playersQuery = usePlayersQuery(
     debouncedSearchTerm,
-    switchDisplay === "players"
+    activeTab === "players"
   );
-  const teamsQuery = useTeamsQuery(
-    debouncedSearchTerm,
-    switchDisplay === "teams"
-  );
+  const teamsQuery = useTeamsQuery(debouncedSearchTerm, activeTab === "teams");
 
-  // Get current data based on active tab
-  const data =
-    switchDisplay === "players" ? playersQuery.data : teamsQuery.data;
+  const data = activeTab === "players" ? playersQuery.data : teamsQuery.data;
   const isLoading =
-    switchDisplay === "players" ? playersQuery.isLoading : teamsQuery.isLoading;
-  const error =
-    switchDisplay === "players" ? playersQuery.error : teamsQuery.error;
+    activeTab === "players" ? playersQuery.isLoading : teamsQuery.isLoading;
+  const error = activeTab === "players" ? playersQuery.error : teamsQuery.error;
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
     setSearchTerm(e.target.value);
-  }
-
-  function setActiveTAb(category: "players" | "teams") {
-    setSwitchDisplay(category);
   }
 
   return (
@@ -45,20 +45,27 @@ export default function Home() {
         <div className="flex gap-3">
           <button
             className={`${
-              switchDisplay == "players" ? "btn-primary" : "buttonSoftLight"
+              activeTab == "players" ? "btn-primary" : "buttonSoftLight"
             } transition-colors`}
-            onClick={() => setActiveTAb("players")}
+            onClick={() => setActiveTab("players")}
           >
             Players
           </button>
           <button
             className={`${
-              switchDisplay == "teams" ? "btn-primary" : "buttonSoftLight"
+              activeTab == "teams" ? "btn-primary" : "buttonSoftLight"
             } transition-colors`}
-            onClick={() => setActiveTAb("teams")}
+            onClick={() => setActiveTab("teams")}
           >
             Teams
           </button>
+        </div>
+        <div className="flex items-center justify-between mb-6">
+          <h1 className="text-3xl font-bold">NBA Stats</h1>
+          <div className="flex items-center gap-4 text-sm text-gray-600">
+            <span>⭐ {favoritePlayerIds.length} Players</span>
+            <span>🏀 {favoriteTeamIds.length} Teams</span>
+          </div>
         </div>
         <input
           value={searchTerm}
@@ -82,8 +89,8 @@ export default function Home() {
         {!isLoading &&
           data &&
           data.data.length > 0 &&
-          switchDisplay === "players" && (
-            <div className="grid grid-cols-3 gap-3">
+          activeTab === "players" && (
+            <div className="grid grid-cols-3 gap-3 ">
               {(data.data as Player[]).map((player: Player) => (
                 <CardPlayers key={player.id} play={player} />
               ))}
@@ -94,18 +101,10 @@ export default function Home() {
         {!isLoading &&
           data &&
           data.data.length > 0 &&
-          switchDisplay === "teams" && (
-            <div className="grid grid-cols-3 gap-3">
+          activeTab === "teams" && (
+            <div className="grid grid-cols-3 gap-3 ">
               {(data.data as Team[]).map((team: Team) => (
-                <div
-                  key={team.id}
-                  className="flex flex-col gap-3 bg-white rounded-lg border border-gray-200 shadow-lg hover:shadow-xl p-6"
-                >
-                  <h2 className="text-2xl">{team.full_name}</h2>
-                  <p>Conference: {team.conference}</p>
-                  <p>Division: {team.division}</p>
-                  <p>City: {team.city}</p>
-                </div>
+                <CardTeams key={team.id} team={team} />
               ))}
             </div>
           )}
