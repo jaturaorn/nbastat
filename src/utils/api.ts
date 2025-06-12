@@ -29,9 +29,20 @@ export const balldontlieAPI = {
   },
 
   // Get teams
-  getTeams: async () => {
-    const response = await api.get<APIResponse<Team>>("/teams");
-    return response.data;
+  getTeams: async (search?: string) => {
+    const params: { per_page: number; search?: string } = { per_page: 30 };
+    if (search) params.search = search;
+    const response = await api.get<APIResponse<Team>>("/teams", { params });
+    const currentTeams = response.data.data.filter(
+      (team) =>
+        team.conference.trim() !== "" &&
+        team.division.trim() !== "" &&
+        team.conference !== "    " // ไม่ใช่ช่องว่าง
+    );
+    return {
+      ...response.data,
+      data: currentTeams,
+    };
   },
 };
 

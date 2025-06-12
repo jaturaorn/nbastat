@@ -14,10 +14,10 @@ const usePlayersQuery = (search?: string, enabled = true) => {
   });
 };
 
-const useTeamsQuery = (enabled = true) => {
+const useTeamsQuery = (search?: string, enabled = true) => {
   return useQuery({
-    queryKey: ["teams"],
-    queryFn: () => balldontlieAPI.getTeams(),
+    queryKey: ["teams", search],
+    queryFn: () => balldontlieAPI.getTeams(search),
     enabled,
     staleTime: 5 * 60 * 1000, // 5 minutes
     retry: 2,
