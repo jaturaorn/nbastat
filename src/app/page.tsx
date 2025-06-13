@@ -9,6 +9,7 @@ import LoadingSkeleton from "@/components/ui/LoadingSkeleton";
 import { useNBAStore } from "@/store/useStore";
 import CardTeams from "@/components/ui/CardTeams";
 import { Star, Trash2 } from "lucide-react";
+import StatsModal from "@/components/ui/StatsModal";
 
 export default function Home() {
   // Global state
@@ -28,6 +29,9 @@ export default function Home() {
   // ✨ เพิ่ม hydration guard
   const [isClient, setIsClient] = useState(false);
 
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedPlayer, setSelectedPlayer] = useState<Player | null>(null);
+
   // ✨ เฉพาะ client เท่านั้นที่ใช้ favorites count
   const favoritesCount = isClient
     ? getFavoritesCount()
@@ -42,6 +46,7 @@ export default function Home() {
   );
   const teamsQuery = useTeamsQuery(debouncedSearchTerm, activeTab === "teams");
 
+  // 🎯 Smart Data Selection
   const rawData = activeTab === "players" ? playersQuery.data : teamsQuery.data;
   const isLoading =
     activeTab === "players" ? playersQuery.isLoading : teamsQuery.isLoading;
@@ -73,6 +78,18 @@ export default function Home() {
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
     setSearchTerm(e.target.value);
   }
+
+  // ✨ Player click handler
+  const handlePlayerClick = (player: Player) => {
+    setSelectedPlayer(player);
+    setIsModalOpen(true);
+  };
+
+  // ✨ Close modal handler
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedPlayer(null);
+  };
 
   useEffect(() => {
     setIsClient(true);
@@ -165,19 +182,23 @@ export default function Home() {
 
         {error && <p>there is err</p>}
 
-        {/* Success State - Players */}
+        {/* ✅ Success State - Players */}
         {!isLoading &&
           data &&
           data.data.length > 0 &&
           activeTab === "players" && (
             <div className="grid grid-cols-3 gap-3 ">
               {(data.data as Player[]).map((player: Player) => (
-                <CardPlayers key={player.id} play={player} />
+                <CardPlayers
+                  key={player.id}
+                  play={player}
+                  onClick={handlePlayerClick}
+                />
               ))}
             </div>
           )}
 
-        {/* Success State - Teams */}
+        {/* ✅ Success State - Teams */}
         {!isLoading &&
           data &&
           data.data.length > 0 &&
@@ -189,8 +210,7 @@ export default function Home() {
             </div>
           )}
 
-        {/* No Results State - ไม่มี data */}
-        {/* No Results State */}
+        {/* 🚫 Empty State */}
         {!isLoading && data && data.data.length === 0 && (
           <div className="text-center py-8">
             {showFavoritesOnly ? (
@@ -207,6 +227,14 @@ export default function Home() {
               <p className="text-gray-500">{`No ${activeTab} found for "${debouncedSearchTerm}"`}</p>
             )}
           </div>
+        )}
+
+        {isModalOpen && selectedPlayer && (
+          <StatsModal
+            player={selectedPlayer}
+            isOpen={isModalOpen}
+            onClose={handleCloseModal}
+          />
         )}
       </div>
     </div>

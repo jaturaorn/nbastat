@@ -3,12 +3,28 @@ import React from "react";
 import { Heart } from "lucide-react";
 import { useNBAStore } from "@/store/useStore";
 
-const CardPlayers = ({ play }: { play: Player }) => {
+const CardPlayers = ({
+  play,
+  onClick,
+}: {
+  play: Player;
+  onClick?: (player: Player) => void;
+}) => {
   const { isPlayerFavorite, togglePlayerFavorite } = useNBAStore();
   const isFavorite = isPlayerFavorite(play.id);
+
+  // ✨ Handler function ที่ wrap onClick prop
+  const handleCardClick = () => {
+    if (onClick) {
+      onClick(play); // ส่ง player object ไป
+    }
+  };
   return (
     <React.Fragment>
-      <div className="flex flex-col gap-3 bg-white rounded-lg border border-gray-200 shadow-lg hover:shadow-xl p-6 relative">
+      <div
+        onClick={handleCardClick}
+        className="flex flex-col gap-3 bg-white rounded-lg border border-gray-200 shadow-lg hover:shadow-xl p-6 relative cursor-pointer"
+      >
         {/* Favorite Button */}
         <button
           onClick={(e) => {
@@ -23,7 +39,7 @@ const CardPlayers = ({ play }: { play: Player }) => {
         >
           <Heart className={`w-5 h-5 ${isFavorite ? "fill-current" : ""}`} />
         </button>
-        <h2 className="text-2xl ">{`${play.first_name} ${play.last_name}`}</h2>
+        <h2 className="text-2xl pr-12">{`${play.first_name} ${play.last_name}`}</h2>
         <h4 className="text-lg">draftNumber: {play.draft_number}</h4>
         <p>Position: {play.position}</p>
         <div className="flex flex-col gap-1">
